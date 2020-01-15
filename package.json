@@ -2,12 +2,13 @@
   "name": "crypto-order-book",
   "version": "1.0.0",
   "description": "",
-  "main": "build/index.js",
+  "main": "index.js",
   "scripts": {
-    "build": "rimraf ./build && tsc",
-    "tsc": "rimraf build && tsc",
-    "dev": "nodemon",
-    "start": "node build/index.js"
+    "dev": "concurrently -k \"npm run build:watch\" \"npm run start:dev\"",
+    "start": "node dist/index.js",
+    "start:dev": "nodemon --inspect=0.0.0.0:9229 dist/index.js",
+    "build": "tsc",
+    "build:watch": "tsc -w"
   },
   "author": "Alex Weltman",
   "license": "ISC",
