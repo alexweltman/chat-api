@@ -1,6 +1,7 @@
 import { getRepository } from 'typeorm';
 import User from '../entity/User';
 import Conversation from '../entity/Conversation';
+import Message from '../entity/Message';
 
 const seedUsers: User[] = [
   {
@@ -25,28 +26,50 @@ const seedUsers: User[] = [
   },
 ];
 
-const seedConversations: any[] = [
+const seedConversations: Conversation[] = [
   {
-    firstUser: 1,
-    secondUser: 2,
+    firstUserId: 1,
+    secondUserId: 2,
   },
   {
-    firstUser: 1,
-    secondUser: 4,
+    firstUserId: 1,
+    secondUserId: 4,
   },
   {
-    firstUser: 2,
-    secondUser: 3,
+    firstUserId: 2,
+    secondUserId: 3,
   },
   {
-    firstUser: 3,
-    secondUser: 4,
+    firstUserId: 3,
+    secondUserId: 4,
   },
   {
-    firstUser: 4,
-    secondUser: 2,
+    firstUserId: 4,
+    secondUserId: 2,
   },
 ];
+
+const generateSeedMessages = (): Message[] => {
+  const messagesPerConvo = [3, 20, 103, 4, 2];
+  const messagesToSave: Message[] = [];
+
+  seedConversations.forEach(({ firstUserId, secondUserId }: Conversation, index: number) => {
+    for (let i=0; i< messagesPerConvo[index]; i++) {
+      const sender = (i % 2) ? firstUserId : secondUserId;
+      const receiver = (i % 2) ? secondUserId : firstUserId;
+
+      const message: Message = {
+        senderId: sender,
+        content: `Seeded message ${i + 1} from user ${sender} to user ${receiver}`,
+        conversationId: index + 1,
+      };
+
+      messagesToSave.push(message);
+    }
+  });
+
+  return messagesToSave;
+};
 
 const seedDb = async () => {
   const userRepo = getRepository(User);
@@ -63,6 +86,15 @@ const seedDb = async () => {
   if (!convos || !convos.length) {
     console.log('seeding conversations');
     await conversationRepo.save(seedConversations);
+  }
+
+  const messagesRepo = getRepository(Message);
+  const messages = await messagesRepo.find();
+
+  if (!messages || !messages.length) {
+    console.log('seeding messages');
+    const messagesToSave = generateSeedMessages();
+    await messagesRepo.save(messagesToSave);
   }
 };
 

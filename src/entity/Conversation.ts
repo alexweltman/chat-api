@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Entity, JoinColumn, ManyToOne, Column } from "typeorm";
 import User from './User';
 import BaseEntity from './BaseEntity';
 
@@ -6,9 +6,16 @@ import BaseEntity from './BaseEntity';
 export default class Conversation extends BaseEntity {
   @ManyToOne(type => User)
   @JoinColumn()
-  firstUser!: User;
+  firstUser?: User;
+
+  @Column()
+  firstUserId!: number;
 
   @ManyToOne(type => User)
   @JoinColumn()
-  secondUser!: User;
+  secondUser?: User;
+
+  @Column()
+  secondUserId!: number;
 }
+

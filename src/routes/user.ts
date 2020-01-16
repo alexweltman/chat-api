@@ -7,17 +7,16 @@ const router = Router();
 
 router.get('/users', async (req: Request, res: Response) => {
   const users = await getRepository(User).find();
-
   res.send(users);
 });
 
 router.get('/users/:id', async (req: Request, res: Response) => {
-  const users = await getRepository(User).findOne(req.params.id);
-  if (!users) {
+  const user = await getRepository(User).findOne(req.params.id);
+  if (!user) {
     res.status(404).send({ error: 'User not found' });
     return;
   }
-  res.send(users);
+  res.send(user);
 });
 
 export default router;

@@ -10,9 +10,15 @@ export default class Message extends BaseEntity {
 
   @ManyToOne(type => User)
   @JoinColumn()
-  sender!: User;
+  sender?: User;
+
+  @Column()
+  senderId!: number;
 
   @ManyToOne(type => Conversation)
   @JoinColumn()
-  conversation!: Conversation;
+  conversation?: Conversation;
+
+  @Column()
+  conversationId!: number;
 }
