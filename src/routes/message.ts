@@ -3,6 +3,8 @@ import { getRepository, Brackets } from 'typeorm';
 import moment from 'moment';
 
 import Message from '../entity/Message';
+import Conversation from '../entity/Conversation';
+import validateBody from '../validation/validation';
 
 const router = Router();
 
@@ -50,6 +52,34 @@ router.get('/messages/:conversationId', async (req: Request, res: Response) => {
   res.send(messages);
 });
 
+router.post('/messages/:conversationId', async (req: Request, res: Response) => {
+  const conversationId = req.params.conversationId;
 
+  const convoRepo = getRepository(Conversation);
+  const conversation = await convoRepo.findOne(conversationId);
+
+  if (!conversation) {
+    res.status(400).send({ error: 'Invalid conversationID provided' });
+  }
+
+  const message = req.body;
+
+  try {
+    validateBody(message);
+  } catch ({ message: error }) {
+    res.status(400).send({ error });
+  }
+
+  if ((conversation?.firstUserId !== message.senderId)
+   && (conversation?.secondUserId !== message.senderId)) {
+    res.status(400).send({ error: `user ${message.senderId} is not in conversation ${conversationId}` });
+   }
+
+  const messageRepo = getRepository(Message);
+  message.conversationId = conversationId;
+  const savedMessage = await messageRepo.save(message)
+
+  res.send(savedMessage);
+});
 
 export default router;
